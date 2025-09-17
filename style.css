@@ -14,6 +14,9 @@
   border: none;
 }
 
+body {
+  overflow: hidden;
+}
 .title {
   font-size: 24px;
   font-weight: bold;
@@ -157,11 +160,18 @@
 
 .overlay {
   position: fixed;
-
+  scale: 0;
+  opacity: 0;
   height: 100vh;
   width: 100vw;
   background: rgba(0, 0, 0, 0.6);
   z-index: 10;
+  transition: opacity 0.1s ease-in;
+}
+
+.overlay.showOverlay {
+  scale: 1;
+  opacity: 1;
 }
 
 .form {
@@ -177,8 +187,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  bottom: 0%;
-  transition: bottom 0.3s ease-in-out;
+  bottom: -100%;
+  transition: bottom 0.3s 0.1s ease-in-out;
 }
 
 .form h2 {
