@@ -15,7 +15,6 @@
 }
 
 body {
-  overflow: hidden;
 }
 .title {
   font-size: 24px;
@@ -29,6 +28,7 @@ body {
   padding-top: 20px;
   padding-inline: 15px;
   margin: 0 auto;
+
   max-width: 600px;
 }
 
@@ -109,6 +109,8 @@ body {
   display: flex;
   gap: 20px;
   flex-direction: column;
+  height: 100%;
+  padding-bottom: 20px;
 }
 
 /* you you can't see it, you can't style it*/
@@ -175,7 +177,7 @@ body {
 }
 
 .form {
-  position: absolute;
+  position: fixed;
   z-index: 11;
   width: 100%;
   background: white;
