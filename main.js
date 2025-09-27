@@ -1,111 +1,81 @@
 let data = [];
+
 const showFormBtn = document.querySelector("#showFormBtn");
 const overlay = document.querySelector(".overlay");
 const form = document.querySelector(".form");
+const addNoteBtn = document.querySelector("#addNoteBtn");
+const textarea = document.querySelector("textarea");
+const notesContainer = document.querySelector(".notes-container");
 
-showFormBtn.addEventListener("click", () => {
+function showForm() {
   overlay.classList.add("showOverlay");
   form.style.bottom = "0%";
-});
-
-overlay.addEventListener("click", () => {
-  hideForm();
-});
-
-// add new note
-const textarea = document.querySelector("textarea");
-const addNewNoteBtn = document.getElementById("addNoteBtn");
-
-function generateId(len = 10) {
-  const dataset = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let id = "";
-  for (let i = 0; i < len; i++) {
-    id += dataset[Math.floor(Math.random() * dataset.length)];
-  }
-  return id;
 }
 
 function hideForm() {
   overlay.classList.remove("showOverlay");
   form.style.bottom = "-100%";
-}
-function addNewNote(text) {
-  if (text.trim() === "") {
-    return null;
-  }
-  return {
-    text: text,
-    createdAt: new Date().toISOString(),
-    status: "pending",
-    id: generateId(),
-  };
+  textarea.value = "";
 }
 
-function addNotes(notes) {
-  const allNotesSpan = document.querySelector(
-    ".btn.btn-gray > span:first-child"
-  );
-  const doneSpan = document.querySelector(".btn.btn-green > span:first-child");
-  const pendingSpan = document.querySelector(
-    ".btn.btn-yellow > span:first-child"
-  );
+function markDone(btn) {
+  const id = btn.parentElement.id;
+  data = data.map((note) => {
+    if (note.id === id) {
+      return { ...note, status: "done" };
+    }
+    return { ...note };
+  });
+  showNotes(data);
+}
 
+function showNotes(notes) {
+  const allNotesSpan = document.querySelector(".btn.btn-gray > span");
+  const doneSpan = document.querySelector(".btn.btn-green > span");
+  const pendingSpan = document.querySelector(".btn.btn-yellow > span");
   allNotesSpan.textContent = notes.length;
-  doneSpan.textContent = notes.filter((note) => note.status == "done").length;
-  pendingSpan.textContent = notes.filter(
-    (note) => note.status === "pending"
-  ).length;
-  const notesContainer = document.querySelector(".notes-container");
+  doneSpan.textContent = notes.filter((n) => n.status === "done").length;
+  pendingSpan.textContent = notes.filter((n) => n.status === "pending").length;
   notesContainer.innerHTML = "";
   notes.forEach((note) => {
-    const noteHtml = `<div class="note ${
-      note.status == "pending" ? "note-pending" : "note-done"
+    const noteHTML = `<div class="note ${
+      note.status === "pending" ? "note-pending" : "note-done"
     }" id="${note.id}">
           <p>${note.text}</p>
           <button onclick="markDone(this)"></button>
           <span>${note.createdAt}</span>
         </div>`;
-    notesContainer.innerHTML += noteHtml;
+    notesContainer.innerHTML += noteHTML;
   });
+}
+function generateId(len = 0) {
+  const possibleChars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let id = "";
+  for (let i = 0; i < len; i++) {
+    id += possibleChars[Math.floor(Math.random() * possibleChars.length)];
+  }
+  return id;
 }
 
-function markDone(el) {
-  const noteId = el.parentElement.id;
-  console.log("id", noteId);
-  data = data.map((note) => {
-    if (note.id === noteId) {
-      return { ...note, status: "done" };
-    }
-    return { ...note };
-  });
-  localStorage.setItem("notes", JSON.stringify(data));
-  addNotes(data);
-  console.log("after add Notes called");
+function createNewNote(text) {
+  if (text.trim() === "") return null;
+  return {
+    text: text,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+    id: generateId(),
+  };
 }
-addNewNoteBtn.addEventListener("click", () => {
+
+showFormBtn.addEventListener("click", showForm);
+
+overlay.addEventListener("click", hideForm);
+
+addNoteBtn.addEventListener("click", () => {
   const text = textarea.value;
-  const newNote = addNewNote(text);
+  const newNote = createNewNote(text);
   if (!newNote) return;
   data.push(newNote);
-  localStorage.setItem("notes", JSON.stringify(data));
-  addNotes(data);
-  textarea.value = "";
+  showNotes(data);
   hideForm();
 });
-
-// search
-const searchInput = document.querySelector(".search_input");
-searchInput.addEventListener("input", () => {
-  const text = searchInput.value;
-  const searchedNotes = data.filter((note) => {
-    const regex = new RegExp(text, "i");
-    return regex.test(note.text);
-  });
-  addNotes(searchedNotes);
-});
-function restoreData() {
-  data = JSON.parse(localStorage.getItem("notes"));
-  addNotes(data);
-}
-
-restoreData();
