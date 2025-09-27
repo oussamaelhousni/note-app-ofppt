@@ -76,6 +76,15 @@ addNoteBtn.addEventListener("click", () => {
   const newNote = createNewNote(text);
   if (!newNote) return;
   data.push(newNote);
+  localStorage.setItem("notes", JSON.stringify(data));
   showNotes(data);
   hideForm();
 });
+
+function restoreData() {
+  if (localStorage.getItem("notes")) {
+    data = JSON.parse(localStorage.getItem("notes"));
+    showNotes(data);
+  }
+}
+restoreData();
